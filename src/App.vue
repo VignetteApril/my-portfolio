@@ -1,45 +1,52 @@
 <template>
-  <div class="glass-provider">
-    <div class="animated-bg"></div>
+  <div class="app-wrapper">
+    <div class="ambient-bg"></div>
 
-    <div class="portfolio-content">
-      <header class="hero-section">
-        <h1 class="glow-text">🚀 张杰作品集</h1>
-        <p class="highlight-p">基于 Vue 3 + DeepSeek-V3 驱动的 AI 数字分身</p>
+    <div class="main-container">
+      <header class="hero">
+        <h1 class="glow-title">✨ 我的 Vibe Coding 创意实验室</h1>
+        <p class="subtitle">顺着灵感流动，用 AI 把生活中的小想法变成现实</p>
       </header>
 
-      <div class="project-grid">
+      <section class="project-grid">
         <div v-for="p in projects" :key="p.name" class="glass-card">
-          <div class="card-icon">{{ p.icon }}</div>
-          <h3>{{ p.name }}</h3>
-          <p class="project-desc">{{ p.desc }}</p>
-          <a :href="'https://' + p.url" target="_blank" class="visit-link">
-            <span>立即访问</span>
-            <svg viewBox="0 0 13 10"><path d="M1,5 L11,5 M8,1 L12,5 L8,9"></path></svg>
-          </a>
+          <div class="card-content">
+            <div class="card-icon">{{ p.icon }}</div>
+            <h3 class="card-title">{{ p.name }}</h3>
+            <p class="card-desc">{{ p.desc }}</p>
+            <a :href="'https://' + p.url" target="_blank" class="launch-btn">
+              <span>去看看</span>
+              <svg class="icon-arrow" viewBox="0 0 13 10"><path d="M1,5 L11,5 M8,1 L12,5 L8,9"></path></svg>
+            </a>
+          </div>
         </div>
-      </div>
+      </section>
 
-      <div class="ai-chat-widget" :class="{ 'is-active': isOpen }">
-        <div class="chat-toggle" @click="isOpen = !isOpen">
-          <div class="avatar-glow">🤖</div>
-          <span v-if="!isOpen">和我的 AI 分身聊聊</span>
-          <span v-else>收起对话</span>
+      <div class="ai-widget" :class="{ 'widget-open': isOpen }">
+        <div class="widget-header" @click="isOpen = !isOpen">
+          <div class="bot-avatar">✨</div>
+          <span class="header-text">{{ isOpen ? '收起对话' : '聊聊这里的 Vibe' }}</span>
+          <span class="header-chevron">{{ isOpen ? '▼' : '▲' }}</span>
         </div>
 
-        <transition name="fade-slide">
-          <div v-if="isOpen" class="chat-window">
-            <div class="messages" ref="msgBox">
-              <div v-for="(m, i) in messages" :key="i" :class="['msg-bubble', m.role]">
-                <div class="msg-content">{{ m.content }}</div>
+        <transition name="slide-up">
+          <div v-if="isOpen" class="chat-body">
+            <div class="chat-messages" ref="msgBox">
+              <div v-for="(m, i) in messages" :key="i" :class="['bubble', m.role]">
+                <div class="bubble-content">{{ m.content }}</div>
               </div>
-              <div v-if="loading" class="msg-bubble assistant typing">AI 正在思考中...</div>
+              <div v-if="loading" class="bubble assistant typing">
+                <span>正在组织语言...</span>
+              </div>
             </div>
-            <div class="input-container">
-              <input v-model="userInput" @keyup.enter="sendChat" placeholder="问问关于项目的事..." :disabled="loading" />
-              <button @click="sendChat" :disabled="loading" class="send-btn">
-                <i class="icon-send">➤</i>
-              </button>
+            <div class="chat-input-area">
+              <input
+                v-model="userInput"
+                @keyup.enter="handleSend"
+                placeholder="随便聊聊..."
+                :disabled="loading"
+              />
+              <button @click="handleSend" :disabled="loading" class="send-action">发送</button>
             </div>
           </div>
         </transition>
@@ -58,19 +65,19 @@ const userInput = ref('');
 const msgBox = ref(null);
 
 const projects = [
-  { name: '宠物喂食互助', url: 'pet-feeding-mvp.vercel.app', desc: '解决邻里间节假日喂猫遛狗的刚需，基于LBS位置撮合。', icon: '🐶' },
-  { name: '职场嘴替工具', url: 'workplace-eq-tool.vercel.app', desc: 'AI 辅助生成高情商沟通文案，化解职场沟通尴尬。', icon: '💬' },
-  { name: 'AI 图像向量化', url: 'image-vectorizer-alpha.vercel.app', desc: '一键完成 AI 实时抠图并生成 SVG 向量路径。', icon: '🖼️' },
-  { name: '小鱼吃大鱼', url: 'fish-game-omega.vercel.app', desc: '经典 Canvas 游戏逻辑实现，探索高帧率物理交互。', icon: '🐟' },
-  { name: '二次元主页', url: 'tsukasa-fanpage.vercel.app', desc: '针对特定角色的视觉风格展示，深度打磨动效。', icon: '🎨' }
+  { name: '邻里喂食互助', url: 'pet-feeding-mvp.vercel.app', desc: '长假期间猫狗没人照看确实让人头疼。我做了这个，想让邻里间能更简单、放心地互相帮个忙。', icon: '🐶' },
+  { name: '职场沟通助手', url: 'workplace-eq-tool.vercel.app', desc: '有些话想说但怕伤感情，这个小工具就是帮大家把话说得更有温度、更得体。', icon: '💬' },
+  { name: '简单图像工具', url: 'image-vectorizer-alpha.vercel.app', desc: '把繁琐的抠图和转图过程简化，让创作灵感不再卡在工具操作上。', icon: '🖼️' },
+  { name: '小鱼大鱼游戏', url: 'fish-game-omega.vercel.app', desc: '回归那种最简单的快乐。打磨手感的过程中，我也找回了那种纯粹的游戏体验。', icon: '🐟' },
+  { name: '私人实验空间', url: 'tsukasa-fanpage.vercel.app', desc: '这里不谈实用性，只谈审美。放了一些我喜欢的动态视觉效果实验。', icon: '🎨' }
 ];
 
-const messages = ref([{ role: 'assistant', content: '嘿！我是作者的 AI 数字分身，想了解我的哪个项目？' }]);
+const messages = ref([{ role: 'assistant', content: '嘿！欢迎来到我的 Vibe Coding 实验室。这里的每一个项目都是我顺着当时的灵感做出来的，你想了解哪个背后的故事？' }]);
 
-const sendChat = async () => {
+const handleSend = async () => {
   if (!userInput.value || loading.value) return;
-  const content = userInput.value;
-  messages.value.push({ role: 'user', content });
+  const text = userInput.value;
+  messages.value.push({ role: 'user', content: text });
   userInput.value = '';
   loading.value = true;
 
@@ -80,122 +87,107 @@ const sendChat = async () => {
     });
     messages.value.push({ role: 'assistant', content: res.data.choices[0].message.content });
   } catch (err) {
-    messages.value.push({ role: 'assistant', content: '由于不可抗力，我的神经网络暂时掉线了...' });
+    messages.value.push({ role: 'assistant', content: '连接好像出了点小问题，我们可以稍后再聊。' });
   } finally {
     loading.value = false;
-    nextTick(() => { if(msgBox.value) msgBox.value.scrollTop = msgBox.value.scrollHeight; });
+    nextTick(() => {
+      if (msgBox.value) msgBox.value.scrollTop = msgBox.value.scrollHeight;
+    });
   }
 };
 </script>
 
 <style scoped>
-/* 核心配色：深邃背景 + 亮色对比 */
-:root {
-  --primary: #ff8e72;
-  --secondary: #ff7654;
-  --bg-dark: #1a1a1a;
-  --glass: rgba(255, 255, 255, 0.1);
-}
-
-.glass-provider {
+.app-wrapper {
   min-height: 100vh;
-  position: relative;
-  overflow-x: hidden;
+  background-color: #0d0d0d;
   color: #fff;
-  background: #121212;
+  font-family: -apple-system, 'Noto Sans SC', sans-serif;
 }
 
-/* 华丽流光背景 */
-.animated-bg {
+.ambient-bg {
   position: fixed;
   top: 0; left: 0; width: 100%; height: 100%;
-  background: linear-gradient(45deg, #1a1a1a, #2c3e50, #1a1a1a);
-  z-index: -1;
+  background: radial-gradient(circle at 50% 15%, #1d1714 0%, #0d0d0d 100%);
+  z-index: 0;
 }
 
-.portfolio-content {
+.main-container {
+  position: relative;
+  z-index: 1;
   max-width: 1100px;
   margin: 0 auto;
-  padding: 60px 20px;
+  padding: 80px 20px;
 }
 
-.hero-section { text-align: center; margin-bottom: 80px; }
-.glow-text {
-  font-size: 3.5rem;
-  font-weight: 800;
-  background: linear-gradient(to right, #ff8e72, #ffcc33);
+.hero { text-align: center; margin-bottom: 70px; }
+.glow-title {
+  font-size: 3rem;
+  background: linear-gradient(135deg, #ff8e72 0%, #ffccaa 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 0 10px rgba(255,142,114,0.3));
+  filter: drop-shadow(0 0 15px rgba(255, 142, 114, 0.25));
 }
-.highlight-p { color: #aaa; font-size: 1.2rem; margin-top: 10px; }
+.subtitle { color: #888; margin-top: 15px; font-size: 1.1rem; }
 
-/* 磨砂玻璃卡片 */
 .project-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 30px;
+  gap: 25px;
 }
 .glass-card {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 40px;
-  border-radius: 24px;
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 20px;
+  backdrop-filter: blur(15px);
+  padding: 35px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .glass-card:hover {
-  transform: translateY(-10px);
-  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-8px);
+  background: rgba(255, 255, 255, 0.05);
   border-color: #ff8e72;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.4);
 }
 
-.card-icon { font-size: 50px; margin-bottom: 20px; }
-.glass-card h3 { font-size: 1.6rem; color: #fff; margin-bottom: 15px; }
-.project-desc { color: #ccc; line-height: 1.6; margin-bottom: 25px; font-size: 0.95rem; }
+.card-icon { font-size: 40px; margin-bottom: 15px; }
+.card-title { font-size: 1.4rem; margin-bottom: 12px; font-weight: 600; }
+.card-desc { color: #999; line-height: 1.7; margin-bottom: 25px; font-size: 0.95rem; }
 
-.visit-link {
-  display: flex; align-items: center; color: #ff8e72; text-decoration: none; font-weight: 700;
+.launch-btn {
+  display: flex; align-items: center; gap: 8px;
+  color: #ff8e72; text-decoration: none; font-weight: 600; font-size: 0.9rem;
 }
-.visit-link svg { width: 18px; fill: none; stroke: currentColor; stroke-width: 2; margin-left: 8px; transition: 0.3s; }
-.visit-link:hover svg { transform: translateX(5px); }
+.icon-arrow { width: 16px; stroke: currentColor; fill: none; stroke-width: 2; }
 
-/* AI 浮动挂件 */
-.ai-chat-widget {
-  position: fixed; bottom: 30px; right: 30px; z-index: 100;
+.ai-widget {
+  position: fixed; bottom: 30px; right: 30px; width: 340px; z-index: 1000;
 }
-.chat-toggle {
-  background: #ff8e72; padding: 12px 25px; border-radius: 50px; cursor: pointer;
-  display: flex; align-items: center; gap: 12px; font-weight: bold;
-  box-shadow: 0 10px 30px rgba(255,142,114,0.4);
+.widget-header {
+  background: #ff8e72; padding: 12px 20px; border-radius: 40px;
+  display: flex; align-items: center; cursor: pointer; color: white;
+  box-shadow: 0 10px 30px rgba(255, 142, 114, 0.35);
 }
-.avatar-glow { font-size: 20px; }
+.header-text { flex: 1; font-size: 0.9rem; margin-left: 10px; font-weight: 600; }
 
-.chat-window {
-  position: absolute; bottom: 80px; right: 0; width: 350px; height: 500px;
-  background: #1e1e1e; border: 1px solid #333; border-radius: 20px;
-  display: flex; flex-direction: column; overflow: hidden;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+.chat-body {
+  position: absolute; bottom: 70px; right: 0; width: 100%;
+  height: 450px; background: #1a1a1a; border-radius: 20px;
+  border: 1px solid #333; display: flex; flex-direction: column;
+  overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.5);
 }
 
-.messages { flex: 1; padding: 20px; overflow-y: auto; background: #161616; }
-.msg-bubble { margin-bottom: 15px; display: flex; }
-.msg-bubble.user { justify-content: flex-end; }
-.msg-content {
-  padding: 12px 18px; border-radius: 15px; max-width: 80%; line-height: 1.5; font-size: 14px;
-}
-.user .msg-content { background: #ff8e72; color: white; }
-.assistant .msg-content { background: #2a2a2a; color: #eee; }
+.chat-messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
+.bubble { max-width: 85%; padding: 12px 16px; border-radius: 15px; font-size: 0.9rem; line-height: 1.5; }
+.assistant { background: #262626; align-self: flex-start; border-bottom-left-radius: 4px; }
+.user { background: #ff8e72; color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
 
-.input-container { padding: 15px; display: flex; gap: 10px; background: #1e1e1e; border-top: 1px solid #333; }
-.input-container input {
-  flex: 1; background: #121212; border: 1px solid #444; color: white;
+.chat-input-area { padding: 15px; display: flex; gap: 8px; background: #1a1a1a; border-top: 1px solid #333; }
+.chat-input-area input {
+  flex: 1; background: #0a0a0a; border: 1px solid #333; color: white;
   padding: 10px 15px; border-radius: 10px; outline: none;
 }
-.send-btn { background: #ff8e72; color: white; border: none; width: 40px; height: 40px; border-radius: 10px; cursor: pointer; }
+.send-action { background: #ff8e72; color: white; border: none; padding: 8px 18px; border-radius: 10px; cursor: pointer; font-weight: 600; }
 
-/* 动画效果 */
-.fade-slide-enter-active, .fade-slide-leave-active { transition: all 0.3s ease; }
-.fade-slide-enter-from, .fade-slide-leave-to { opacity: 0; transform: translateY(20px); }
+.slide-up-enter-active, .slide-up-leave-active { transition: all 0.35s ease; }
+.slide-up-enter-from, .slide-up-leave-to { opacity: 0; transform: translateY(30px); }
 </style>
